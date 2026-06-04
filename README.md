@@ -15,42 +15,82 @@ This repository provides service-based motion commands for:
 - emergency stop;
 - optional model-aided virtual-wrench reconciliation for research use.
 
-The package is designed for the DAVE BlueROV2 simulator using direct thruster commands. It is intended to be simple enough for normal path-following experiments, while also providing optional modules for advanced fault-tolerant control and sensor-actuator reconciliation research.
+The package is designed for the **DAVE ROS 2 BlueROV2 simulator** using direct thruster commands. It is intended to be simple enough for normal path-following experiments, while also providing optional modules for advanced fault-tolerant control and sensor-actuator reconciliation research.
 
 ---
 
-## 1. Package structure
+## 1. Prerequisites
+
+This package requires a working installation of the **DAVE ROS 2 BlueROV2 simulator**.
+
+Please install and verify DAVE before using this controller:
+
+<https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9>
+
+The controller assumes that DAVE provides the BlueROV2 odometry topic and the six Gazebo thruster command topics:
+
+```text
+/model/bluerov2/odometry
+/model/bluerov2/joint/thruster1_joint/cmd_thrust
+/model/bluerov2/joint/thruster2_joint/cmd_thrust
+/model/bluerov2/joint/thruster3_joint/cmd_thrust
+/model/bluerov2/joint/thruster4_joint/cmd_thrust
+/model/bluerov2/joint/thruster5_joint/cmd_thrust
+/model/bluerov2/joint/thruster6_joint/cmd_thrust
+```
+
+Required software:
+
+- ROS 2 Jazzy or a compatible ROS 2 distribution;
+- DAVE ROS 2 BlueROV2 simulator;
+- Gazebo / Gazebo Harmonic transport tools used by DAVE;
+- `ros_gz_bridge`;
+- Python 3;
+- `numpy`;
+- standard ROS 2 message packages: `geometry_msgs`, `nav_msgs`, `std_msgs`, `std_srvs`.
+
+> **Important:** This package uses direct thruster-level control. For direct allocation experiments, launch DAVE with `use_ardusub:=false` and `use_teleop:=false` so that ArduSub/MAVROS does not compete with this controller for the thruster command topics.
+
+---
+
+## 2. Package structure
 
 ```text
 bluerov2_reconciled_path_control_ros2/
-├── bluerov2_path_interfaces/
-│   └── srv/
-│       ├── GoTo.srv
-│       ├── FollowWaypoints.srv
-│       ├── FollowCircle.srv
-│       ├── FollowSpiral.srv
-│       └── FollowTrajectory.srv
+├── src/
+│   ├── bluerov2_path_interfaces/
+│   │   └── srv/
+│   │       ├── GoTo.srv
+│   │       ├── FollowWaypoints.srv
+│   │       ├── FollowCircle.srv
+│   │       ├── FollowSpiral.srv
+│   │       └── FollowTrajectory.srv
+│   │
+│   └── bluerov2_path_control/
+│       ├── bluerov2_path_control/
+│       │   ├── path_controller_node.py
+│       │   ├── mission_client.py
+│       │   ├── hydrodynamics.py
+│       │   └── reconciliation.py
+│       │
+│       ├── launch/
+│       │   ├── path_controller.launch.py
+│       │   └── direct_thruster_bridge.launch.py
+│       │
+│       └── config/
+│           └── bluerov2_path_control.yaml
 │
-└── bluerov2_path_control/
-    ├── bluerov2_path_control/
-    │   ├── path_controller_node.py
-    │   ├── mission_client.py
-    │   ├── hydrodynamics.py
-    │   └── reconciliation.py
-    │
-    ├── launch/
-    │   ├── path_controller.launch.py
-    │   └── direct_thruster_bridge.launch.py
-    │
-    └── config/
-        └── bluerov2_path_control.yaml
+├── docs/
+├── README.md
+├── LICENSE
+└── CITATION.cff
 ```
 
 ---
 
-## 2. Main features
+## 3. Main features
 
-### 2.1 Mission-level services
+### 3.1 Mission-level services
 
 The controller exposes the following ROS 2 services:
 
@@ -66,7 +106,7 @@ The controller exposes the following ROS 2 services:
 /path_controller/reset_reconciliation
 ```
 
-### 2.2 Direct-thruster allocation
+### 3.2 Direct-thruster allocation
 
 The controller subscribes to DAVE odometry and publishes directly to the six BlueROV2 thruster command topics:
 
@@ -79,7 +119,7 @@ The controller subscribes to DAVE odometry and publishes directly to the six Blu
 /model/bluerov2/joint/thruster6_joint/cmd_thrust
 ```
 
-The package uses the experimentally identified DAVE BlueROV2 thrust-allocation signs:
+The package uses experimentally identified DAVE BlueROV2 thrust-allocation signs:
 
 ```text
 T1: -X, -Y, -yaw
@@ -116,7 +156,7 @@ u_min <= u_k <= u_max
 
 ---
 
-## 3. Optional research module: virtual-wrench reconciliation
+## 4. Optional research module: virtual-wrench reconciliation
 
 This repository includes optional advanced modules for research:
 
@@ -125,7 +165,9 @@ hydrodynamics.py
 reconciliation.py
 ```
 
-### 3.1 Model-aided wrench reconstruction
+The reconciliation module is disabled by default so that the package behaves as a clean path-following controller for normal use.
+
+### 4.1 Model-aided wrench reconstruction
 
 The hydrodynamics module provides BlueROV2 heavy/classic parameter sets and estimates a reduced 4-DOF generalized wrench:
 
@@ -145,7 +187,7 @@ where
 nu = [u, v, w, r]^T.
 ```
 
-### 3.2 Projected virtual-wrench reconciliation
+### 4.2 Projected virtual-wrench reconciliation
 
 The reconciliation module estimates a bounded net actuator-induced wrench defect:
 
@@ -166,45 +208,41 @@ The allocator can then compensate using:
 tau_target = tau_cmd - r_a_hat
 ```
 
-This module is disabled by default and can be enabled at runtime.
-
----
-
-## 4. Important operating mode
-
-For direct-thruster path control, launch DAVE without ArduSub/teleop:
-
-```bash
-ros2 launch dave_demos dave_robot.launch.py \
-  z:=-0.5 \
-  namespace:=bluerov2 \
-  world_name:=dave_ocean_waves \
-  paused:=false \
-  use_ardusub:=false \
-  use_teleop:=false
-```
-
-This is important because ArduSub also commands the internal thruster topics. For direct allocation experiments, this controller should be the only source of thruster commands.
+This module can be enabled at runtime using a ROS 2 service.
 
 ---
 
 ## 5. Installation
 
-### 5.1 Clone into your workspace
+### 5.1 Install DAVE first
+
+Install the DAVE ROS 2 BlueROV2 simulator by following the official setup instructions:
+
+<https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9>
+
+Verify that DAVE launches correctly before building this controller package.
+
+### 5.2 Clone this repository
+
+Option A: clone into the ROS 2 workspace source folder:
 
 ```bash
 cd ~/dave_ws/src
-git clone <your-repo-url> bluerov2_reconciled_path_control_ros2
+git clone https://github.com/drwa92/bluerov2_reconciled_path_control_ros2.git
 ```
 
-If the repository contains the two packages directly, copy or keep them under `src/` as:
+Because this repository contains packages under its own `src/` directory, `colcon` will discover them recursively.
+
+Option B: keep only the two packages directly under `~/dave_ws/src`:
 
 ```text
 ~/dave_ws/src/bluerov2_path_interfaces
 ~/dave_ws/src/bluerov2_path_control
 ```
 
-### 5.2 Build
+Both layouts are acceptable as long as duplicate copies of the same packages are not present in the workspace.
+
+### 5.3 Build
 
 ```bash
 cd ~/dave_ws
@@ -212,7 +250,7 @@ colcon build --packages-select bluerov2_path_interfaces bluerov2_path_control
 source install/setup.bash
 ```
 
-### 5.3 Verify installation
+### 5.4 Verify installation
 
 ```bash
 ros2 pkg list | grep bluerov2_path
@@ -258,7 +296,7 @@ bluerov2_path_control path_controller
 
 ## 6. Launching
 
-### Terminal 1: launch DAVE
+### Terminal 1: launch DAVE in direct-control mode
 
 ```bash
 cd ~/dave_ws
@@ -273,6 +311,8 @@ ros2 launch dave_demos dave_robot.launch.py \
   use_teleop:=false
 ```
 
+This launch mode is recommended because this package directly commands thruster topics. If ArduSub/teleop is enabled, it may also publish to the internal thruster topics and compete with this controller.
+
 ### Terminal 2: launch controller and bridge
 
 ```bash
@@ -283,6 +323,8 @@ ros2 launch bluerov2_path_control path_controller.launch.py \
   model_name:=bluerov2 \
   use_bridge:=true
 ```
+
+The launch file starts the path controller and bridges the six Gazebo thruster command topics to ROS 2.
 
 ### Terminal 3: check services
 
@@ -317,8 +359,6 @@ ros2 service call /path_controller/go_to bluerov2_path_interfaces/srv/GoTo \
 
 The ROV will move to the requested pose and hold there.
 
----
-
 ### 7.2 Follow waypoints
 
 ```bash
@@ -330,8 +370,6 @@ ros2 service call /path_controller/follow_waypoints bluerov2_path_interfaces/srv
   {position: {x: 0.0, y: 0.0, z: -0.5}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}
 ], speed: 0.12, loop: false, hold_at_end: true}"
 ```
-
----
 
 ### 7.3 Follow a circle
 
@@ -351,16 +389,12 @@ ros2 service call /path_controller/follow_circle bluerov2_path_interfaces/srv/Fo
 
 Use `turns: 0.0` for continuous circle tracking until stopped.
 
----
-
 ### 7.4 Follow a spiral
 
 ```bash
 ros2 service call /path_controller/follow_spiral bluerov2_path_interfaces/srv/FollowSpiral \
 "{center_x: 0.0, center_y: 0.0, z: -0.5, radius_start: 0.1, radius_end: 1.8, duration: 160.0, turns: 2.0, clockwise: false, yaw_mode: 'tangent', yaw: 0.0, hold_at_end: true}"
 ```
-
----
 
 ### 7.5 Generic trajectory service
 
@@ -590,7 +624,25 @@ ros2 service call /path_controller/follow_spiral bluerov2_path_interfaces/srv/Fo
 
 ## 13. Troubleshooting
 
-### 13.1 Duplicate package names during build
+### 13.1 DAVE is not installed or the simulator does not launch
+
+Install and verify the DAVE ROS 2 BlueROV2 simulator before using this package:
+
+<https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9>
+
+A typical direct-control launch command is:
+
+```bash
+ros2 launch dave_demos dave_robot.launch.py \
+  z:=-0.5 \
+  namespace:=bluerov2 \
+  world_name:=dave_ocean_waves \
+  paused:=false \
+  use_ardusub:=false \
+  use_teleop:=false
+```
+
+### 13.2 Duplicate package names during build
 
 If you see:
 
@@ -608,6 +660,12 @@ rm -rf bluerov2_adv_ws bluerov2_clean_control_ws bluerov2_clean_control_ws_fixed
 touch backups/COLCON_IGNORE 2>/dev/null || true
 ```
 
+If your GitHub repository folder is inside `~/dave_ws`, either move it outside the workspace or add:
+
+```bash
+touch ~/dave_ws/bluerov2_reconciled_path_control_ros2/COLCON_IGNORE
+```
+
 Then rebuild:
 
 ```bash
@@ -615,7 +673,7 @@ colcon build --packages-select bluerov2_path_interfaces bluerov2_path_control
 source install/setup.bash
 ```
 
-### 13.2 Interface package not found
+### 13.3 Interface package not found
 
 Check:
 
@@ -633,13 +691,30 @@ colcon build --packages-select bluerov2_path_interfaces bluerov2_path_control
 source install/setup.bash
 ```
 
-### 13.3 Thruster commands do not move the ROV
+### 13.4 Thruster command topics do not exist
 
 Confirm Gazebo thruster topics exist:
 
 ```bash
 gz topic -l | grep cmd_thrust
 ```
+
+Expected:
+
+```text
+/model/bluerov2/joint/thruster1_joint/cmd_thrust
+/model/bluerov2/joint/thruster2_joint/cmd_thrust
+/model/bluerov2/joint/thruster3_joint/cmd_thrust
+/model/bluerov2/joint/thruster4_joint/cmd_thrust
+/model/bluerov2/joint/thruster5_joint/cmd_thrust
+/model/bluerov2/joint/thruster6_joint/cmd_thrust
+```
+
+If these topics are missing, DAVE BlueROV2 is not launched correctly. Revisit the DAVE setup instructions:
+
+<https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9>
+
+### 13.5 Thruster commands do not move the ROV
 
 Confirm ROS bridge topics exist:
 
@@ -653,11 +728,11 @@ If using direct control, make sure DAVE was launched with:
 use_ardusub:=false use_teleop:=false
 ```
 
-### 13.4 ROV moves in the wrong direction
+### 13.6 ROV moves in the wrong direction
 
-The allocation matrix may not match your vehicle model variant. Run a single-thruster sign test and update the allocation signs.
+The allocation matrix may not match your vehicle model variant. Run a single-thruster sign test and update the allocation signs if needed.
 
-### 13.5 Controller oscillates
+### 13.7 Controller oscillates
 
 Reduce gains:
 
@@ -667,7 +742,7 @@ kd_xy: slightly higher
 kp_yaw: lower
 ```
 
-### 13.6 ROV lags on moving paths
+### 13.8 ROV lags on moving paths
 
 Make sure reference-velocity feedforward is enabled in the configuration.
 
@@ -722,24 +797,11 @@ Suggested placeholder:
 
 ---
 
-## GitHub Pages website
 
-This repository includes a static GitHub Pages website in `docs/`.
-
-After pushing to GitHub, enable Pages from:
-
-```text
-Settings -> Pages -> Deploy from a branch -> main -> /docs
-```
-
-
-See [`GITHUB_REPO_SETUP.md`](GITHUB_REPO_SETUP.md) for complete repository publishing commands.
 
 ## Affiliation
 
-This package is maintained by **Waseem Akram** at **MARVIS LAB**.
+This package is maintained by **Waseem Akram** at **Labust**.
 
-- Lab website: <https://drwa92.github.io/marvis-lab/>
 - GitHub: <https://github.com/drwa92>
 - Contact: <drwa92@gmail.com>
-
