@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlueROV2 Reconciled Path Control</title>
+  <meta name="description" content="ROS 2 direct-thruster path-following controller for BlueROV2 in DAVE/Gazebo with optional model-aided virtual-wrench reconciliation." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+<nav>
+  <div class="brand">BlueROV2 Reconciled Path Control</div>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="quickstart.html">Quickstart</a>
+    <a href="api.html">Services</a>
+    <a href="reconciliation.html">Reconciliation</a>
+    <a href="https://github.com/drwa92/bluerov2_reconciled_path_control_ros2">GitHub</a>
+    <a href="https://drwa92.github.io/marvis-lab/">MARVIS LAB</a>
+  </div>
+</nav>
+<header class="hero">
+  <div>
+    <h1>Service-driven BlueROV2 path following with optional virtual-wrench reconciliation.</h1>
+    <p>
+      A clean ROS 2 controller for DAVE/Gazebo that lets a BlueROV2 go to poses,
+      follow waypoints, circles, spirals, and generic trajectories using direct six-thruster allocation.
+      The research layer adds model-aided wrench reconstruction and projected virtual-wrench reconciliation.
+    </p>
+    <div class="badges">
+      <span class="badge">ROS 2</span><span class="badge">DAVE/Gazebo</span><span class="badge">BlueROV2</span>
+      <span class="badge">Direct thruster allocation</span><span class="badge">Fault-tolerant research layer</span>
+    </div>
+    <div class="actions">
+      <a class="button primary" href="quickstart.html">Get started</a>
+      <a class="button" href="api.html">View services</a>
+      <a class="button" href="reconciliation.html">Research module</a>
+    </div>
+  </div>
+  <div class="card">
+    <img class="diagram" src="assets/block_diagram.svg" alt="Block diagram" />
+  </div>
+</header>
+<main>
+  <section>
+    <h2>Features</h2>
+    <div class="grid">
+      <div class="feature"><h3>Mission services</h3><p>Call ROS 2 services for go-to, waypoint lists, circle, spiral, generic trajectory, stop, and emergency stop.</p></div>
+      <div class="feature"><h3>Direct thruster control</h3><p>Publishes directly to DAVE BlueROV2 Gazebo thrust topics through a ROS-Gazebo bridge.</p></div>
+      <div class="feature"><h3>Rate-aware allocation</h3><p>Maps virtual forces into six thruster commands while enforcing command magnitude and slew limits.</p></div>
+      <div class="feature"><h3>Research reconciliation</h3><p>Optionally estimates a net virtual-wrench defect and compensates it through the allocation target.</p></div>
+    </div>
+  </section>
+  <section>
+    <h2>Repository layout</h2>
+<pre><code>src/
+  bluerov2_path_interfaces/   # custom mission services
+  bluerov2_path_control/      # controller, launch files, config
+docs/                         # GitHub Pages website
+.github/workflows/            # optional ROS 2 CI
+README.md
+LICENSE
+CITATION.cff</code></pre>
+  </section>
+  <section>
+    <h2>Quick command preview</h2>
+<pre><code>ros2 launch bluerov2_path_control path_controller.launch.py \
+  model_name:=bluerov2 use_bridge:=true
+
+ros2 service call /path_controller/follow_circle \
+  bluerov2_path_interfaces/srv/FollowCircle \
+  "{center_x: 0.0, center_y: 0.0, z: -0.5, radius: 1.0, period: 90.0, \
+    turns: 1.0, clockwise: false, yaw_mode: 'tangent', yaw: 0.0, hold_at_end: true}"</code></pre>
+  </section>
+  <section class="callout">
+    <strong>Safety note:</strong> This package is intended for simulation and research. Test carefully in DAVE/Gazebo before using any logic on hardware.
+  </section>
+</main>
+<footer><p>Maintained by Waseem Akram, MARVIS LAB. <a href="https://drwa92.github.io/marvis-lab/">Lab website</a>.</p></footer>
+</body>
+</html>

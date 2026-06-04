@@ -1,0 +1,13 @@
+# Command the ROV to move from the current pose to one target pose.
+# Position is expressed in the world/odometry frame used by /model/<name>/odometry.
+float64 x
+float64 y
+float64 z
+float64 yaw
+# Desired translation speed in m/s. If <=0, the controller default is used.
+float64 speed
+# If true, hold position at the target after arrival. If false, zero thrusters after arrival.
+bool hold_at_goal
+---
+bool accepted
+string message

@@ -1,0 +1,18 @@
+# Follow a horizontal Archimedean spiral.
+float64 center_x
+float64 center_y
+float64 z
+float64 radius_start
+float64 radius_end
+# Total duration in seconds. If <=0, duration is inferred from default speed.
+float64 duration
+float64 turns
+bool clockwise
+# "fixed" or "tangent".
+string yaw_mode
+# Used when yaw_mode="fixed".
+float64 yaw
+bool hold_at_end
+---
+bool accepted
+string message

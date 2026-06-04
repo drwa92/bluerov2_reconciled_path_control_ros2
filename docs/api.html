@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Services | BlueROV2 Reconciled Path Control</title><link rel="stylesheet" href="assets/style.css"/></head>
+<body><nav><div class="brand">BlueROV2 Reconciled Path Control</div><div class="links"><a href="index.html">Home</a><a href="quickstart.html">Quickstart</a><a href="api.html">Services</a><a href="reconciliation.html">Reconciliation</a></div></nav>
+<main><h1>Mission service API</h1>
+<section><h2>Services</h2>
+<table><thead><tr><th>Service</th><th>Type</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>/path_controller/go_to</code></td><td><code>GoTo</code></td><td>Move to one pose and optionally hold.</td></tr>
+<tr><td><code>/path_controller/follow_waypoints</code></td><td><code>FollowWaypoints</code></td><td>Follow a list of geometry_msgs/Pose waypoints.</td></tr>
+<tr><td><code>/path_controller/follow_circle</code></td><td><code>FollowCircle</code></td><td>Track a circle with fixed or tangent yaw.</td></tr>
+<tr><td><code>/path_controller/follow_spiral</code></td><td><code>FollowSpiral</code></td><td>Track an expanding or shrinking spiral.</td></tr>
+<tr><td><code>/path_controller/follow_trajectory</code></td><td><code>FollowTrajectory</code></td><td>Generic trajectory entry point for square, circle, spiral, and line paths.</td></tr>
+<tr><td><code>/path_controller/stop</code></td><td><code>std_srvs/Trigger</code></td><td>Stop current mission and hold current pose.</td></tr>
+<tr><td><code>/path_controller/emergency_stop</code></td><td><code>std_srvs/SetBool</code></td><td>Zero thrusters and disable/enable control.</td></tr>
+</tbody></table></section>
+<section><h2>Circle example</h2>
+<pre><code>ros2 service call /path_controller/follow_circle bluerov2_path_interfaces/srv/FollowCircle \
+"{center_x: 0.0, center_y: 0.0, z: -0.5, radius: 1.0, period: 90.0, \
+  turns: 1.0, clockwise: false, yaw_mode: 'tangent', yaw: 0.0, hold_at_end: true}"</code></pre>
+</section>
+<section><h2>Waypoint example</h2>
+<pre><code>ros2 service call /path_controller/follow_waypoints bluerov2_path_interfaces/srv/FollowWaypoints \
+"{waypoints: [
+  {position: {x: 1.0, y: 0.0, z: -0.5}, orientation: {x: 0, y: 0, z: 0, w: 1}},
+  {position: {x: 1.0, y: 1.0, z: -0.5}, orientation: {x: 0, y: 0, z: 0, w: 1}}
+], speed: 0.12, loop: false, hold_at_end: true}"</code></pre>
+</section>
+</main><footer><p>BlueROV2 Reconciled Path Control &mdash; maintained by Waseem Akram, MARVIS LAB. <a href="https://drwa92.github.io/marvis-lab/">Lab website</a>.</p></footer>
+</body></html>

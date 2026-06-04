@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "BlueROV2 Reconciled Path Control ROS 2"
+message: "If you use this software in academic work, please cite the associated paper or this repository."
+type: software
+authors:
+  - family-names: Akram
+    given-names: Waseem
+    email: drwa92@gmail.com
+    affiliation: MARVIS LAB
+repository-code: "https://github.com/drwa92/bluerov2_reconciled_path_control_ros2"
+url: "https://drwa92.github.io/bluerov2_reconciled_path_control_ros2/"
+license: MIT
+version: 0.1.0
+

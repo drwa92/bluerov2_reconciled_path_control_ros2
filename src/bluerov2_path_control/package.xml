@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>bluerov2_path_control</name>
+  <version>0.1.0</version>
+  <description>Clean direct-thruster BlueROV2 path-following controller for ROS 2 and DAVE/Gazebo.</description>
+  <maintainer email="drwa92@gmail.com">Waseem Akram</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>bluerov2_path_interfaces</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

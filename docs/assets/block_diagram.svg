@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="BlueROV2 path control and reconciliation architecture">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9cc4ff"/>
+    </marker>
+  </defs>
+  <rect width="900" height="520" rx="28" fill="#0a1324"/>
+  <g font-family="Inter,Arial" font-size="18" fill="#e8f0ff" text-anchor="middle">
+    <rect x="40" y="70" width="160" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="120" y="105">Mission</text><text x="120" y="128" fill="#b9c6dd" font-size="14">go-to / paths</text>
+    <rect x="260" y="70" width="170" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="345" y="105">Path</text><text x="345" y="128" fill="#b9c6dd" font-size="14">reference generator</text>
+    <rect x="500" y="70" width="170" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="585" y="105">PID / SMC</text><text x="585" y="128" fill="#b9c6dd" font-size="14">virtual wrench</text>
+    <rect x="710" y="70" width="150" height="72" rx="16" fill="url(#g)" stroke="#38bdf8"/>
+    <text x="785" y="105">Allocator</text><text x="785" y="128" fill="#e6f6ff" font-size="14">rate-aware</text>
+    <rect x="710" y="230" width="150" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="785" y="265">BlueROV2</text><text x="785" y="288" fill="#b9c6dd" font-size="14">DAVE/Gazebo</text>
+    <rect x="500" y="230" width="170" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="585" y="265">Wrench</text><text x="585" y="288" fill="#b9c6dd" font-size="14">reconstruction</text>
+    <rect x="260" y="230" width="180" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="350" y="265">Projected</text><text x="350" y="288" fill="#b9c6dd" font-size="14">r̂<tspan baseline-shift="sub">a</tspan> reconciliation</text>
+    <rect x="40" y="230" width="170" height="72" rx="16" fill="#13243e" stroke="#27405f"/>
+    <text x="125" y="265">Sensor</text><text x="125" y="288" fill="#b9c6dd" font-size="14">confidence gate</text>
+    <rect x="260" y="380" width="390" height="72" rx="16" fill="#10243a" stroke="#22c55e"/>
+    <text x="455" y="415">Optional research layer</text><text x="455" y="438" fill="#b9c6dd" font-size="14">model-aided virtual-wrench reconciliation</text>
+  </g>
+  <g stroke="#9cc4ff" stroke-width="3" fill="none" marker-end="url(#arrow)">
+    <path d="M200 106 H260"/><path d="M430 106 H500"/><path d="M670 106 H710"/>
+    <path d="M785 142 V230"/><path d="M710 266 H670"/><path d="M500 266 H440"/><path d="M260 266 H210"/>
+    <path d="M125 230 C125 175 705 175 725 135"/>
+    <path d="M350 230 C420 170 680 156 720 130"/>
+    <path d="M455 380 V315"/>
+  </g>
+</svg>

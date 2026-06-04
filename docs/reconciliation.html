@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Reconciliation | BlueROV2 Reconciled Path Control</title><link rel="stylesheet" href="assets/style.css"/></head>
+<body><nav><div class="brand">BlueROV2 Reconciled Path Control</div><div class="links"><a href="index.html">Home</a><a href="quickstart.html">Quickstart</a><a href="api.html">Services</a><a href="reconciliation.html">Reconciliation</a></div></nav>
+<main><h1>Optional virtual-wrench reconciliation module</h1>
+<section><p>The standard path controller can be used without any research module. For fault-tolerant allocation experiments, enable the optional model-aided virtual-wrench module.</p></section>
+<section><h2>Logic</h2>
+<p>The controller reconstructs an estimated achieved wrench from measured body velocity and a BlueROV2 hydrodynamic model:</p>
+<pre><code>tau_est = M_eff * nu_dot + D(nu) * nu</code></pre>
+<p>It compares this with the nominal wrench predicted by the allocation matrix:</p>
+<pre><code>e_a = tau_est - B*u - rhat_a</code></pre>
+<p>Then it updates a bounded virtual-wrench estimate:</p>
+<pre><code>rhat_a(k+1) = Proj_R( rhat_a(k) + gain * e_a )</code></pre>
+<p>The allocation target becomes:</p>
+<pre><code>tau_target = tau_command - rhat_a</code></pre>
+</section>
+<section><h2>Enable and reset</h2>
+<pre><code>ros2 service call /path_controller/enable_reconciliation std_srvs/srv/SetBool "{data: true}"
+ros2 service call /path_controller/reset_reconciliation std_srvs/srv/Trigger "{}"</code></pre>
+</section>
+<section><h2>Diagnostic topics</h2>
+<table><thead><tr><th>Topic</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>/path_controller/reconciliation/estimated_wrench</code></td><td>Model-aided estimate of achieved wrench.</td></tr>
+<tr><td><code>/path_controller/reconciliation/nominal_wrench</code></td><td>Nominal wrench predicted by allocation matrix.</td></tr>
+<tr><td><code>/path_controller/reconciliation/raw_residual</code></td><td>Estimated raw actuator/wrench residual.</td></tr>
+<tr><td><code>/path_controller/reconciliation/compensated_residual</code></td><td>Residual after subtracting virtual-wrench estimate.</td></tr>
+<tr><td><code>/path_controller/reconciliation/rhat</code></td><td>Projected virtual-wrench correction.</td></tr>
+</tbody></table>
+</section>
+<section class="callout warning"><strong>Research note:</strong> The public package exposes the optional reconciliation layer. Full comparison experiments with baselines and fault injection should be kept in a separate research/experiment package.</section>
+</main><footer><p>BlueROV2 Reconciled Path Control &mdash; maintained by Waseem Akram, MARVIS LAB. <a href="https://drwa92.github.io/marvis-lab/">Lab website</a>.</p></footer>
+</body></html>

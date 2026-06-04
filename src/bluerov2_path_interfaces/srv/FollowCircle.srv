@@ -1,0 +1,18 @@
+# Follow a horizontal circle.
+float64 center_x
+float64 center_y
+float64 z
+float64 radius
+# Time for one full revolution in seconds.
+float64 period
+# Number of turns. If <=0, run continuously until stopped.
+float64 turns
+bool clockwise
+# "fixed" or "tangent".
+string yaw_mode
+# Used when yaw_mode="fixed".
+float64 yaw
+bool hold_at_end
+---
+bool accepted
+string message

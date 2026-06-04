@@ -1,0 +1,13 @@
+# Generic trajectory service for scripting experiments.
+# Supported trajectory_type values:
+#   "square": params=[side, segment_time, z, yaw]
+#   "circle": params=[center_x, center_y, z, radius, period, turns, clockwise(0/1), yaw]
+#   "spiral": params=[center_x, center_y, z, radius_start, radius_end, duration, turns, clockwise(0/1), yaw]
+#   "line": params=[x0, y0, z0, yaw0, x1, y1, z1, yaw1, duration]
+string trajectory_type
+float64[] params
+string yaw_mode
+bool hold_at_end
+---
+bool accepted
+string message

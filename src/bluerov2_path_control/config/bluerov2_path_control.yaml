@@ -1,0 +1,81 @@
+path_controller:
+  ros__parameters:
+    use_sim_time: true
+    model_name: bluerov2
+    odom_topic: /model/bluerov2/odometry
+    cmd_topic_template: /model/bluerov2/joint/thruster{idx}_joint/cmd_thrust
+
+    # Controller update rate.
+    rate_hz: 50.0
+
+    # DAVE BlueROV2 direct-thruster allocation identified experimentally.
+    # Controlled wrench: [X, Y, Z, N]^T = B * u, with u=[T1..T6]^T.
+    # T5/T6 positive command drives negative world z in DAVE, so Z row is [-1,-1].
+    allocation_matrix_flat: [-0.70710678, -0.70710678,  0.70710678,  0.70710678, 0.0, 0.0,
+                             -0.70710678,  0.70710678, -0.70710678,  0.70710678, 0.0, 0.0,
+                              0.0,         0.0,         0.0,         0.0,        -1.0, -1.0,
+                             -1.0,         1.0,         1.0,        -1.0,         0.0, 0.0]
+
+    # Thruster constraints. 40 N matches common BlueROV2 controller configs.
+    thruster_max: 40.0
+    thruster_min: -40.0
+    thruster_rate_max: 80.0   # N/s
+    allocation_rho: 0.03
+    allocation_iterations: 30
+
+    # Wrench limits.
+    tau_xy_max: 25.0
+    tau_z_max: 45.0
+    tau_yaw_max: 8.0
+
+    # Controller gains. These are conservative DAVE starting values.
+    controller_mode: pid       # pid or smc
+    use_ref_velocity: true
+    velocity_frame: body       # body or world
+    kp_xy: 8.0
+    kd_xy: 8.0
+    ki_xy: 0.0
+    ixy_max: 2.0
+    kp_z: 35.0
+    kd_z: 12.0
+    ki_z: 6.0
+    iz_max: 3.0
+    kp_yaw: 2.0
+    kd_yaw: 1.5
+    ki_yaw: 0.0
+    iyaw_max: 1.0
+
+    # Smooth SMC augmentation, used when controller_mode=smc.
+    ks_smc_xy: 1.0
+    ks_smc_z: 1.0
+    ks_smc_yaw: 0.5
+    smc_slope: 3.0
+    lambda_xy: 0.6
+    lambda_z: 0.8
+    lambda_yaw: 0.5
+
+    # Mission behavior.
+    default_speed: 0.12
+    default_goal_tolerance: 0.12
+    default_yaw_tolerance: 0.08
+    hold_at_start: true
+    stop_thrusters_on_idle: true
+    debug_period_sec: 2.0
+    log_to_csv: true
+    log_dir: ~/dave_ws/results_bluerov2_path_control
+
+    # Optional advanced sensor--actuator reconciliation modules.
+    # Disabled by default. Enable at launch or with /path_controller/enable_reconciliation.
+    enable_wrench_reconciliation: false
+    hydro_model: heavy       # heavy or classic
+    vehicle_mass: 10.0       # kg, approximate DAVE BlueROV2 base mass
+    vehicle_izz: 0.269       # kg m^2, approximate yaw inertia from SDF
+    wrench_observer_alpha: 0.20
+    wrench_derivative_clip: 5.0
+    recon_gain: 0.08
+    rhat_bound_xy: 8.0
+    rhat_bound_z: 12.0
+    rhat_bound_yaw: 8.0
+    rhat_rate_limit: 0.8
+    sensor_gate_min: 0.25
+    sensor_confidence: 1.0

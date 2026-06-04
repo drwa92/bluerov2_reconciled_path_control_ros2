@@ -1,0 +1,11 @@
+# Follow a list of waypoint poses in the world/odometry frame.
+geometry_msgs/Pose[] waypoints
+# Desired segment speed in m/s. If <=0, the controller default is used.
+float64 speed
+# Repeat the waypoint list until stopped.
+bool loop
+# Hold the last waypoint when the mission finishes.
+bool hold_at_end
+---
+bool accepted
+string message
