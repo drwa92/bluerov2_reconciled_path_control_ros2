@@ -25,7 +25,7 @@
     <p>
       A clean ROS 2 controller for DAVE/Gazebo that lets a BlueROV2 go to poses,
       follow waypoints, circles, spirals, and generic trajectories using direct six-thruster allocation.
-      The research layer adds model-aided wrench reconstruction and projected virtual-wrench reconciliation.
+      The optional research layer adds model-aided wrench reconstruction and projected virtual-wrench reconciliation.
     </p>
     <div class="badges">
       <span class="badge">ROS 2</span><span class="badge">DAVE/Gazebo</span><span class="badge">BlueROV2</span>
@@ -42,15 +42,32 @@
   </div>
 </header>
 <main>
+  <section class="callout">
+    <strong>DAVE simulator required:</strong>
+    This package is designed for the ROS 2 DAVE BlueROV2 simulator. Install and verify DAVE before using the controller:
+    <a href="https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9">DAVE ROS 2 BlueROV2 simulator documentation</a>.
+  </section>
+
   <section>
     <h2>Features</h2>
     <div class="grid">
       <div class="feature"><h3>Mission services</h3><p>Call ROS 2 services for go-to, waypoint lists, circle, spiral, generic trajectory, stop, and emergency stop.</p></div>
-      <div class="feature"><h3>Direct thruster control</h3><p>Publishes directly to DAVE BlueROV2 Gazebo thrust topics through a ROS-Gazebo bridge.</p></div>
+      <div class="feature"><h3>Direct thruster control</h3><p>Publishes directly to DAVE BlueROV2 Gazebo thrust topics through <code>ros_gz_bridge</code>.</p></div>
       <div class="feature"><h3>Rate-aware allocation</h3><p>Maps virtual forces into six thruster commands while enforcing command magnitude and slew limits.</p></div>
       <div class="feature"><h3>Research reconciliation</h3><p>Optionally estimates a net virtual-wrench defect and compensates it through the allocation target.</p></div>
     </div>
   </section>
+
+  <section>
+    <h2>Prerequisites</h2>
+    <ul>
+      <li>ROS 2 Jazzy or a compatible ROS 2 distribution.</li>
+      <li>DAVE ROS 2 BlueROV2 simulator: <a href="https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9">installation guide</a>.</li>
+      <li><code>ros_gz_bridge</code> for ROS-to-Gazebo thruster command bridging.</li>
+      <li>DAVE launched in direct-control mode with <code>use_ardusub:=false</code> and <code>use_teleop:=false</code>.</li>
+    </ul>
+  </section>
+
   <section>
     <h2>Repository layout</h2>
 <pre><code>src/
@@ -62,18 +79,27 @@ README.md
 LICENSE
 CITATION.cff</code></pre>
   </section>
+
   <section>
     <h2>Quick command preview</h2>
-<pre><code>ros2 launch bluerov2_path_control path_controller.launch.py \
+<pre><code># Launch DAVE first
+ros2 launch dave_demos dave_robot.launch.py \
+  z:=-0.5 namespace:=bluerov2 world_name:=dave_ocean_waves \
+  paused:=false use_ardusub:=false use_teleop:=false
+
+# Launch controller and bridge
+ros2 launch bluerov2_path_control path_controller.launch.py \
   model_name:=bluerov2 use_bridge:=true
 
+# Command a circle mission
 ros2 service call /path_controller/follow_circle \
   bluerov2_path_interfaces/srv/FollowCircle \
   "{center_x: 0.0, center_y: 0.0, z: -0.5, radius: 1.0, period: 90.0, \
     turns: 1.0, clockwise: false, yaw_mode: 'tangent', yaw: 0.0, hold_at_end: true}"</code></pre>
   </section>
-  <section class="callout">
-    <strong>Safety note:</strong> This package is intended for simulation and research. Test carefully in DAVE/Gazebo before using any logic on hardware.
+
+  <section class="callout warning">
+    <strong>Safety note:</strong> This package directly commands thruster force topics. It is intended for simulation and research. Test carefully in DAVE/Gazebo before using any logic on hardware.
   </section>
 </main>
 <footer><p>Maintained by Waseem Akram, MARVIS LAB. <a href="https://drwa92.github.io/marvis-lab/">Lab website</a>.</p></footer>

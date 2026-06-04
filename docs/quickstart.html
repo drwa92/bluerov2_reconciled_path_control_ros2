@@ -1,31 +1,94 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Quickstart | BlueROV2 Reconciled Path Control</title><link rel="stylesheet" href="assets/style.css"/></head>
-<body><nav><div class="brand">BlueROV2 Reconciled Path Control</div><div class="links"><a href="index.html">Home</a><a href="quickstart.html">Quickstart</a><a href="api.html">Services</a><a href="reconciliation.html">Reconciliation</a></div></nav>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Quickstart | BlueROV2 Reconciled Path Control</title>
+  <link rel="stylesheet" href="assets/style.css"/>
+</head>
+<body>
+<nav><div class="brand">BlueROV2 Reconciled Path Control</div><div class="links"><a href="index.html">Home</a><a href="quickstart.html">Quickstart</a><a href="api.html">Services</a><a href="reconciliation.html">Reconciliation</a></div></nav>
 <main>
 <h1>Quickstart</h1>
+<section class="callout">
+  <strong>Required simulator:</strong> Install and verify the ROS 2 DAVE BlueROV2 simulator before using this controller:
+  <a href="https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9">DAVE ROS 2 BlueROV2 installation guide</a>.
+</section>
+
+<section><h2>0. Launch DAVE in direct-control mode</h2>
+<p>The controller owns the six thruster command topics. Therefore, launch DAVE without ArduSub and teleop so that no other controller competes for thruster commands.</p>
+<pre><code>cd ~/dave_ws
+source install/setup.bash
+
+ros2 launch dave_demos dave_robot.launch.py \
+  z:=-0.5 \
+  namespace:=bluerov2 \
+  world_name:=dave_ocean_waves \
+  paused:=false \
+  use_ardusub:=false \
+  use_teleop:=false</code></pre>
+</section>
+
 <section><h2>1. Clone and build</h2>
 <pre><code>cd ~/dave_ws/src
 git clone https://github.com/drwa92/bluerov2_reconciled_path_control_ros2.git
+
+# If the repository contains packages under src/, copy/symlink them into your workspace src.
+# The expected workspace package paths are:
+# ~/dave_ws/src/bluerov2_path_interfaces
+# ~/dave_ws/src/bluerov2_path_control
+
 cd ~/dave_ws
 colcon build --packages-select bluerov2_path_interfaces bluerov2_path_control
 source install/setup.bash</code></pre>
 </section>
-<section><h2>2. Launch DAVE without ArduSub control</h2>
-<pre><code>ros2 launch dave_demos dave_robot.launch.py \
-  z:=-0.5 namespace:=bluerov2 world_name:=dave_ocean_waves \
-  paused:=false use_ardusub:=false use_teleop:=false</code></pre>
+
+<section><h2>2. Verify installation</h2>
+<pre><code>ros2 pkg list | grep bluerov2_path
+ros2 interface list | grep bluerov2_path_interfaces
+ros2 pkg executables bluerov2_path_control</code></pre>
+<p>Expected packages:</p>
+<pre><code>bluerov2_path_control
+bluerov2_path_interfaces</code></pre>
 </section>
+
 <section><h2>3. Launch the controller and thruster bridge</h2>
-<pre><code>ros2 launch bluerov2_path_control path_controller.launch.py \
-  model_name:=bluerov2 use_bridge:=true</code></pre>
+<pre><code>cd ~/dave_ws
+source install/setup.bash
+
+ros2 launch bluerov2_path_control path_controller.launch.py \
+  model_name:=bluerov2 \
+  use_bridge:=true</code></pre>
+<p>The launch file starts the path controller and bridges the six DAVE Gazebo thruster command topics to ROS 2.</p>
 </section>
+
 <section><h2>4. Check services</h2>
 <pre><code>ros2 service list | grep path_controller</code></pre>
+<p>Expected mission services include:</p>
+<pre><code>/path_controller/go_to
+/path_controller/follow_waypoints
+/path_controller/follow_circle
+/path_controller/follow_spiral
+/path_controller/follow_trajectory
+/path_controller/stop
+/path_controller/emergency_stop
+/path_controller/enable_reconciliation
+/path_controller/reset_reconciliation</code></pre>
 </section>
+
 <section><h2>5. Command a first mission</h2>
 <pre><code>ros2 service call /path_controller/go_to bluerov2_path_interfaces/srv/GoTo \
 "{x: 0.0, y: 0.0, z: -0.5, yaw: 0.0, speed: 0.15, hold_at_goal: true}"</code></pre>
+<p>Monitor pose:</p>
+<pre><code>ros2 topic echo /model/bluerov2/odometry --field pose.pose.position</code></pre>
 </section>
+
+<section><h2>6. Confirm DAVE thruster topics if the ROV does not move</h2>
+<pre><code>gz topic -l | grep cmd_thrust
+ros2 topic list | grep cmd_thrust</code></pre>
+<p>You should see six topics ending in <code>thruster1_joint/cmd_thrust</code> through <code>thruster6_joint/cmd_thrust</code>.</p>
+</section>
+
 <section><h2>Emergency stop</h2>
 <pre><code>ros2 service call /path_controller/emergency_stop std_srvs/srv/SetBool "{data: true}"
 ros2 service call /path_controller/emergency_stop std_srvs/srv/SetBool "{data: false}"</code></pre>

@@ -3,6 +3,7 @@
 <body><nav><div class="brand">BlueROV2 Reconciled Path Control</div><div class="links"><a href="index.html">Home</a><a href="quickstart.html">Quickstart</a><a href="api.html">Services</a><a href="reconciliation.html">Reconciliation</a></div></nav>
 <main><h1>Optional virtual-wrench reconciliation module</h1>
 <section><p>The standard path controller can be used without any research module. For fault-tolerant allocation experiments, enable the optional model-aided virtual-wrench module.</p></section>
+<section class="callout"><strong>DAVE dependency:</strong> The module uses DAVE odometry and BlueROV2 direct thruster commands. Install and run DAVE ROS 2 BlueROV2 first: <a href="https://dave-ros2.notion.site/?v=d54cc8422868455888cc629d8e6117a9">DAVE ROS 2 documentation</a>.</section>
 <section><h2>Logic</h2>
 <p>The controller reconstructs an estimated achieved wrench from measured body velocity and a BlueROV2 hydrodynamic model:</p>
 <pre><code>tau_est = M_eff * nu_dot + D(nu) * nu</code></pre>
@@ -25,6 +26,11 @@ ros2 service call /path_controller/reset_reconciliation std_srvs/srv/Trigger "{}
 <tr><td><code>/path_controller/reconciliation/compensated_residual</code></td><td>Residual after subtracting virtual-wrench estimate.</td></tr>
 <tr><td><code>/path_controller/reconciliation/rhat</code></td><td>Projected virtual-wrench correction.</td></tr>
 </tbody></table>
+</section>
+<section><h2>Troubleshooting diagnostics</h2>
+<pre><code>ros2 topic list | grep reconciliation
+ros2 topic echo /path_controller/reconciliation/rhat
+ros2 topic echo /path_controller/reconciliation/raw_residual</code></pre>
 </section>
 <section class="callout warning"><strong>Research note:</strong> The public package exposes the optional reconciliation layer. Full comparison experiments with baselines and fault injection should be kept in a separate research/experiment package.</section>
 </main><footer><p>BlueROV2 Reconciled Path Control &mdash; maintained by Waseem Akram, MARVIS LAB. <a href="https://drwa92.github.io/marvis-lab/">Lab website</a>.</p></footer>
