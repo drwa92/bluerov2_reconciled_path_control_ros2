@@ -2,7 +2,7 @@
 
 A clean ROS 2 direct-thruster path-following controller for the BlueROV2 in DAVE/Gazebo.
 
-Maintained by **Waseem Akram** at **[MARVIS LAB](https://drwa92.github.io/marvis-lab/)**.
+Maintained by **Waseem Akram** at **[Labust LAB](https://github.com/labust)**.
 
 This repository provides service-based motion commands for:
 
