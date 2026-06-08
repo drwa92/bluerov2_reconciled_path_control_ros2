@@ -76,8 +76,28 @@ nav .links { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .95rem; }
 .actions { display: flex; gap: .8rem; flex-wrap: wrap; margin-top: 1.5rem; }
 .button { display: inline-flex; align-items: center; border-radius: .75rem; padding: .75rem 1rem; font-weight: 700; border: 1px solid var(--line); background: var(--panel2); color: var(--text); }
 .button.primary { background: linear-gradient(135deg, var(--accent), #2563eb); border-color: transparent; color: white; }
-.card { background: linear-gradient(180deg, rgba(19,36,62,.92), rgba(15,29,51,.92)); border: 1px solid var(--line); border-radius: 1.25rem; padding: 1.25rem; box-shadow: 0 20px 70px rgba(0,0,0,.25); }
-.diagram { width: 100%; min-height: 330px; }
+
+.card {
+  overflow: hidden;
+}
+
+.diagram {
+  max-width: 100%;
+  min-height: 460px;
+  object-fit: contain;
+}
+.diagram-card {
+  grid-column: 1 / -1;
+  padding: 24px;
+}
+
+.diagram {
+  width: 100%;
+  height: auto;
+  min-height: 620px;
+  object-fit: contain;
+  display: block;
+}
 main { max-width: 1200px; margin: 0 auto; padding: 1rem min(6vw, 4rem) 5rem; }
 section { margin: 3rem 0; }
 h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0 0 1rem; }
