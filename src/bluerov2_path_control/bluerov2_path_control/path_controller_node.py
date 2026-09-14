@@ -103,7 +103,6 @@ class BlueROV2PathController(Node):
             "cmd_topic_template", "/model/bluerov2/joint/thruster{idx}_joint/cmd_thrust"
         )
         self.declare_parameter("rate_hz", 50.0)
-        self.declare_parameter("use_sim_time", True)
 
         # Allocation.
         default_b = [
